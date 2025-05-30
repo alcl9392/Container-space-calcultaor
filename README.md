@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>20ft Container Space Calculator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .specs {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .specs h3 {
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .spec-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .spec-item {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 15px;
+            border-radius: 10px;
+            backdrop-filter: blur(5px);
+        }
+
+        .input-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .input-group {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .input-group h3 {
+            margin-bottom: 20px;
+            color: #333;
+            text-align: center;
+            font-size: 1.2em;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .calculate-btn {
+            display: block;
+            width: 200px;
+            margin: 0 auto 30px;
+            padding: 15px 30px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .calculate-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .results {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .result-card {
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            transform: translateY(20px);
+            opacity: 0;
+            transition: all 0.5s ease;
+        }
+
+        .result-card.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .remaining {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+        }
+
+        .used {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            color: white;
+        }
+
+        .result-card h3 {
+            margin-bottom: 15px;
+            font-size: 1.4em;
+        }
+
+        .result-value {
+            font-size: 2em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 5px;
+            margin: 15px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 5px;
+            transition: width 0.8s ease;
+        }
+
+        .warning {
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+            color: #721c24;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
+            
+            .input-section {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📦 20ft Container Space Calculator</h1>
+        
+        <div class="specs">
+            <h3>Standard 20ft Container Specifications</h3>
+            <div class="spec-grid">
+                <div class="spec-item">
+                    <strong>Length:</strong> 19.4 ft (5.9 m)
+                </div>
+                <div class="spec-item">
+                    <strong>Width:</strong> 7.7 ft (2.35 m)
+                </div>
+                <div class="spec-item">
+                    <strong>Height:</strong> 7.9 ft (2.39 m)
+                </div>
+                <div class="spec-item">
+                    <strong>Volume:</strong> 1,172 cu ft (33.2 m³)
+                </div>
+                <div class="spec-item">
+                    <strong>Max Weight:</strong> 55,126 lbs (25,000 kg)
+                </div>
+                <div class="spec-item">
+                    <strong>Tare Weight:</strong> 5,071 lbs (2,300 kg)
+                </div>
+            </div>
+        </div>
+
+        <div class="input-section">
+            <div class="input-group">
+                <h3>📏 Package Dimensions</h3>
+                <div class="form-group">
+                    <label for="length">Length (feet):</label>
+                    <input type="number" id="length" step="0.1" min="0" placeholder="Enter length">
+                </div>
+                <div class="form-group">
+                    <label for="width">Width (feet):</label>
+                    <input type="number" id="width" step="0.1" min="0" placeholder="Enter width">
+                </div>
+                <div class="form-group">
+                    <label for="height">Height (feet):</label>
+                    <input type="number" id="height" step="0.1" min="0" placeholder="Enter height">
+                </div>
+                <div class="form-group">
+                    <label for="quantity">Quantity:</label>
+                    <input type="number" id="quantity" min="1" value="1" placeholder="Number of packages">
+                </div>
+            </div>
+
+            <div class="input-group">
+                <h3>⚖️ Package Weight</h3>
+                <div class="form-group">
+                    <label for="weight">Weight per package (lbs):</label>
+                    <input type="number" id="weight" step="0.1" min="0" placeholder="Enter weight">
+                </div>
+                <div class="form-group">
+                    <label for="unit">Unit System:</label>
+                    <select id="unit" style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 10px; font-size: 16px; background: rgba(255, 255, 255, 0.9);">
+                        <option value="imperial">Imperial (ft, lbs)</option>
+                        <option value="metric">Metric (m, kg)</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <button class="calculate-btn" onclick="calculateSpace()">🧮 Calculate Remaining Space</button>
+
+        <div id="results" class="results"></div>
+    </div>
+
+    <script>
+        // Container specifications
+        const containerSpecs = {
+            imperial: {
+                length: 19.4,
+                width: 7.7,
+                height: 7.9,
+                volume: 1172,
+                maxWeight: 55126,
+                tareWeight: 5071
+            },
+            metric: {
+                length: 5.9,
+                width: 2.35,
+                height: 2.39,
+                volume: 33.2,
+                maxWeight: 25000,
+                tareWeight: 2300
+            }
+        };
+
+        function calculateSpace() {
+            const length = parseFloat(document.getElementById('length').value) || 0;
+            const width = parseFloat(document.getElementById('width').value) || 0;
+            const height = parseFloat(document.getElementById('height').value) || 0;
+            const weight = parseFloat(document.getElementById('weight').value) || 0;
+            const quantity = parseInt(document.getElementById('quantity').value) || 1;
+            const unit = document.getElementById('unit').value;
+            
+            if (length === 0 || width === 0 || height === 0 || weight === 0) {
+                alert('Please enter all dimensions and weight values.');
+                return;
+            }
+
+            const specs = containerSpecs[unit];
+            const unitSymbol = unit === 'imperial' ? { length: 'ft', volume: 'ft³', weight: 'lbs' } : { length: 'm', volume: 'm³', weight: 'kg' };
+
+            // Calculate package volume
+            const packageVolume = length * width * height;
+            const totalPackageVolume = packageVolume * quantity;
+            const totalPackageWeight = weight * quantity;
+            const netWeightCapacity = specs.maxWeight - specs.tareWeight;
+
+            // Calculate remaining space and weight
+            const remainingVolume = specs.volume - totalPackageVolume;
+            const remainingWeight = netWeightCapacity - totalPackageWeight;
+
+            // Calculate percentages
+            const volumeUsedPercent = (totalPackageVolume / specs.volume) * 100;
+            const weightUsedPercent = (totalPackageWeight / netWeightCapacity) * 100;
+
+            // Check for warnings
+            let warnings = [];
+            if (length > specs.length) warnings.push(`Package length (${length}${unitSymbol.length}) exceeds container length (${specs.length}${unitSymbol.length})`);
+            if (width > specs.width) warnings.push(`Package width (${width}${unitSymbol.length}) exceeds container width (${specs.width}${unitSymbol.length})`);
+            if (height > specs.height) warnings.push(`Package height (${height}${unitSymbol.length}) exceeds container height (${specs.height}${unitSymbol.length})`);
+            if (remainingVolume < 0) warnings.push('Total package volume exceeds container capacity!');
+            if (remainingWeight < 0) warnings.push('Total package weight exceeds container weight limit!');
+
+            displayResults(remainingVolume, remainingWeight, totalPackageVolume, totalPackageWeight, volumeUsedPercent, weightUsedPercent, unitSymbol, warnings, specs, netWeightCapacity);
+        }
+
+        function displayResults(remainingVolume, remainingWeight, usedVolume, usedWeight, volumePercent, weightPercent, units, warnings, specs, netCapacity) {
+            const resultsDiv = document.getElementById('results');
+            
+            let warningHtml = '';
+            if (warnings.length > 0) {
+                warningHtml = `<div class="warning">⚠️ ${warnings.join('<br>⚠️ ')}</div>`;
+            }
+
+            resultsDiv.innerHTML = `
+                ${warningHtml}
+                <div class="result-card remaining">
+                    <h3>🆓 Remaining Space</h3>
+                    <div class="result-value">${Math.max(0, remainingVolume).toFixed(2)} ${units.volume}</div>
+                    <div>Weight Capacity: ${Math.max(0, remainingWeight).toFixed(2)} ${units.weight}</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: ${Math.min(100 - volumePercent, 100)}%"></div>
+                    </div>
+                    <small>${Math.max(0, 100 - volumePercent).toFixed(1)}% volume remaining</small>
+                </div>
+                
+                <div class="result-card used">
+                    <h3>📦 Space Used</h3>
+                    <div class="result-value">${usedVolume.toFixed(2)} ${units.volume}</div>
+                    <div>Weight Used: ${usedWeight.toFixed(2)} ${units.weight}</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: ${Math.min(volumePercent, 100)}%"></div>
+                    </div>
+                    <small>${volumePercent.toFixed(1)}% volume used</small>
+                </div>
+                
+                <div class="result-card remaining">
+                    <h3>📊 Container Utilization</h3>
+                    <div style="margin-bottom: 15px;">
+                        <strong>Volume:</strong> ${volumePercent.toFixed(1)}% used<br>
+                        <strong>Weight:</strong> ${weightPercent.toFixed(1)}% used
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: ${Math.min(Math.max(volumePercent, weightPercent), 100)}%"></div>
+                    </div>
+                    <small>Overall utilization: ${Math.max(volumePercent, weightPercent).toFixed(1)}%</small>
+                </div>
+                
+                <div class="result-card used">
+                    <h3>📋 Summary</h3>
+                    <div style="text-align: left; font-size: 0.9em;">
+                        <strong>Container Capacity:</strong><br>
+                        • Volume: ${specs.volume} ${units.volume}<br>
+                        • Net Weight: ${netCapacity.toFixed(0)} ${units.weight}<br><br>
+                        
+                        <strong>Your Packages:</strong><br>
+                        • Total Volume: ${usedVolume.toFixed(2)} ${units.volume}<br>
+                        • Total Weight: ${usedWeight.toFixed(2)} ${units.weight}<br><br>
+                        
+                        <strong>Remaining:</strong><br>
+                        • Volume: ${Math.max(0, remainingVolume).toFixed(2)} ${units.volume}<br>
+                        • Weight: ${Math.max(0, remainingWeight).toFixed(2)} ${units.weight}
+                    </div>
+                </div>
+            `;
+
+            // Animate cards
+            setTimeout(() => {
+                document.querySelectorAll('.result-card').forEach((card, index) => {
+                    setTimeout(() => {
+                        card.classList.add('show');
+                    }, index * 100);
+                });
+            }, 100);
+        }
+
+        // Update container specs display when unit changes
+        document.getElementById('unit').addEventListener('change', function() {
+            const unit = this.value;
+            const specs = containerSpecs[unit];
+            const unitSymbol = unit === 'imperial' ? { length: 'ft', volume: 'ft³', weight: 'lbs' } : { length: 'm', volume: 'm³', weight: 'kg' };
+            
+            document.querySelector('.specs').innerHTML = `
+                <h3>Standard 20ft Container Specifications</h3>
+                <div class="spec-grid">
+                    <div class="spec-item">
+                        <strong>Length:</strong> ${specs.length} ${unitSymbol.length}
+                    </div>
+                    <div class="spec-item">
+                        <strong>Width:</strong> ${specs.width} ${unitSymbol.length}
+                    </div>
+                    <div class="spec-item">
+                        <strong>Height:</strong> ${specs.height} ${unitSymbol.length}
+                    </div>
+                    <div class="spec-item">
+                        <strong>Volume:</strong> ${specs.volume} ${unitSymbol.volume}
+                    </div>
+                    <div class="spec-item">
+                        <strong>Max Weight:</strong> ${specs.maxWeight.toLocaleString()} ${unitSymbol.weight}
+                    </div>
+                    <div class="spec-item">
+                        <strong>Tare Weight:</strong> ${specs.tareWeight.toLocaleString()} ${unitSymbol.weight}
+                    </div>
+                </div>
+            `;
+        });
+
+        // Allow Enter key to calculate
+        document.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                calculateSpace();
+            }
+        });
+    </script>
+</body>
+</html>![image](https://github.com/user-attachments/assets/e0702698-94c1-4b2b-bb09-d9dde451e803)
